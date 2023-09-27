@@ -15,12 +15,28 @@ spec:
       labels:
         app: bggdb
     spec:
-      containers:
+      volumes:
+      - name: data-vol
+        persistentVolumeClaim:
+          claimName: bggdb-pvc
+      - name: config-vol
+        configMap:
+          name: bgg-cm
+      - name: tmp-vol
+        emptyDir: {}
+
       - name: bggdb-container
         image: stackupiss/bgg-database:v1
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3306
+        volumeMounts:
+        - name: data-vol
+          mountPath: /var/lib/mysql
+        - name: config-vol
+          mountPath: /opt/config
+        - name: tmp-vol
+          mountPath: /opt/tmp
 ---
 apiVersion: v1
 kind: Service
